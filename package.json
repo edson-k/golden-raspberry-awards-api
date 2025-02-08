@@ -9,7 +9,9 @@
     "scripts": {
         "start": "node dist/main.js",
         "dev": "nest start --watch",
-        "test": "jest  --config=jest.config.js"
+        "test": "jest  --config=jest.config.js",
+        "build": "tsc",
+        "prestart": "npm run build"
     },
     "dependencies": {
         "@nestjs/common": "^11.0.7",

@@ -30,6 +30,14 @@ npm run start
 
 ---
 
+## **📌 Docker**
+Construir a Imagem e rodar
+```sh
+docker-compose up -d app
+```
+
+---
+
 ## **🧪 Testes**
 Para rodar os testes de integração:
 
