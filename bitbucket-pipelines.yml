@@ -1,0 +1,14 @@
+image: node:20
+
+pipelines:
+  default:
+    - step:
+        name: 🔄 Checkout do código
+        caches:
+          - node
+        script:
+          - echo "📥 Instalando dependências..."
+          - npm install
+
+          - echo "🚀 Rodando testes..."
+          - npm run test
