@@ -18,7 +18,7 @@ npm install
 Para iniciar o servidor em modo de desenvolvimento:
 
 ```sh
-npm run start:dev
+npm run dev
 ```
 
 Para executar no modo de produção:
