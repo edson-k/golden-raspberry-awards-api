@@ -1,7 +1,22 @@
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put } from '@nestjs/common';
+import { 
+    BadRequestException, 
+    Body, 
+    Controller, 
+    Delete, 
+    Get, 
+    NotFoundException, 
+    Param, 
+    Post, 
+    Put, 
+    UploadedFile, 
+    UseInterceptors 
+} from '@nestjs/common';
+import * as path from 'path';
+import { diskStorage } from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { MovieService } from './movie.service';
 import { Movie } from './movie.entity';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Movies')
 @Controller('movies')
@@ -78,5 +93,36 @@ export class MovieController {
         } catch (error: any) {
             throw new NotFoundException(error.message);
         }
+    }
+
+    @Post('import-csv')
+    @ApiOperation({ summary: 'Importar filmes via CSV', description: 'Importa uma lista de filmes a partir de um arquivo CSV enviado pelo usuário.' })
+    @ApiResponse({ status: 201, description: 'Filmes importados com sucesso' })
+    @ApiResponse({ status: 400, description: 'Erro ao processar o arquivo' })
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: diskStorage({
+                destination: './uploads',
+                filename: (_req, file, cb) => {
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                    cb(null, `${uniqueSuffix}-${file.originalname}`);
+                },
+            }),
+            fileFilter: (_req, file, cb) => {
+                if (!file.originalname.match(/\.(csv)$/)) {
+                    return cb(new BadRequestException('Somente arquivos CSV são permitidos'), false);
+                }
+                cb(null, true);
+            },
+        }),
+    )
+    async importCsv(@UploadedFile() file: Express.Multer.File) {
+        if (!file) {
+            throw new BadRequestException('Arquivo CSV é obrigatório.');
+        }
+
+        const filePath = path.resolve(file.path);
+        const result = await this.movieService.importCsv(filePath);
+        return { message: 'Importação concluída.', ...result };
     }
 }

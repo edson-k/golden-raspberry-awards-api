@@ -1,4 +1,4 @@
-# **Golden Raspberry API** 🎬🏆
+# **Golden Raspberry Awards API** 🎬🏆
 
 ## **Descrição**
 API RESTful para consulta dos indicados e vencedores do prêmio **Golden Raspberry Awards**, incluindo informações sobre filmes e produtores.
@@ -67,6 +67,7 @@ npm run test
 | **POST** | `/movies` | Cadastra um novo filme |
 | **PUT** | `/movies/{id}` | Atualiza um filme existente por ID |
 | **DELETE** | `/movies/{id}` | Remove um filme por ID |
+| **POST** | `/movies/import-csv` | Cadastra novos filmes apartir de uma arquivo csv |
 
 ### **🎭 Produtores**
 | Método | Rota                               | Descrição |

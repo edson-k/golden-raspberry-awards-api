@@ -1,9 +1,10 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MovieModule } from './movie/movie.module';
-import { ProducerModule } from './producer/producer.module';
+import { MulterModule } from '@nestjs/platform-express';
 import { readFileSync } from 'fs';
 import { parse } from 'csv-parse/sync';
+import { MovieModule } from './movie/movie.module';
+import { ProducerModule } from './producer/producer.module';
 import { Movie } from './movie/movie.entity';
 import { Producer } from './producer/producer.entity';
 import { MovieService } from './movie/movie.service';
@@ -15,6 +16,9 @@ import { MovieService } from './movie/movie.service';
             database: ':memory:',
             entities: [Movie, Producer],
             synchronize: true,
+        }),
+        MulterModule.register({
+            dest: './uploads', // Diretório para salvar os arquivos CSV temporariamente
         }),
         MovieModule,
         ProducerModule,

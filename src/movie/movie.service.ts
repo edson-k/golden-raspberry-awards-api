@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Movie } from './movie.entity';
 import { Producer } from '../producer/producer.entity';
+import * as fs from 'fs';
+import csvParser from 'csv-parser';
 
 interface MovieCSV {
     title: string;
@@ -97,7 +99,7 @@ export class MovieService {
         return this.movieRepository.save(newMovie);
     }
     
-    async insertMovies(movies: MovieCSV[]) {
+    async insertMovies(movies: MovieCSV[]): Promise<{ inserted: number; ignored: number }> {
         console.log('Validando e inserindo filmes na base de dados...');
     
         let insertedCount = 0;
@@ -148,7 +150,8 @@ export class MovieService {
     
         console.log(`Filmes inseridos com sucesso: ${insertedCount}`);
         console.log(`Filmes ignorados: ${ignoredCount}`);
-    }          
+        return { inserted: insertedCount, ignored: ignoredCount };
+    }
 
     async delete(id: number): Promise<void> {
         const movie = await this.movieRepository.findOne({ where: { id } });
@@ -158,5 +161,28 @@ export class MovieService {
         }
     
         await this.movieRepository.remove(movie);
+    }
+
+    async importCsv(filePath: string) {
+        const movies: MovieCSV[] = [];
+        
+        return new Promise<{ inserted: number; ignored: number }>((resolve, reject) => {
+            fs.createReadStream(filePath)
+                .pipe(csvParser({ separator: ';' }))
+                .on('data', (row) => {
+                    movies.push({
+                        year: row.year,
+                        title: row.title,
+                        studios: row.studios,
+                        producers: row.producers,
+                        winner: row.winner,
+                    });
+                })
+                .on('end', async () => {
+                    const result = await this.insertMovies(movies);
+                    resolve(result);
+                })
+                .on('error', (error) => reject(error));
+        });
     }
 }

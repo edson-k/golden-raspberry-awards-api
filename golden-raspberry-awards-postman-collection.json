@@ -169,6 +169,31 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Importar CSV",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/caminho/para/o/arquivo.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/movies/import-csv",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "3000",
+					"path": ["movies", "import-csv"]
+				}
+			},
+			"response": []
 		}
 	]
 }
