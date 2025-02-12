@@ -1,6 +1,6 @@
 {
     "name": "golden-raspberry-awards-api",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "engines": {
         "node": ">=20.18.2",
         "npm": ">=10.8.2"
