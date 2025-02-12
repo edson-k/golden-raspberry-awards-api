@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { readFileSync } from 'fs';
-import { parse } from 'csv-parse/sync';
+import { parse } from 'csv-parse/sync'; 
 
 interface MovieCSV {
     title: string;
