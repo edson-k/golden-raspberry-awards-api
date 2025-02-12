@@ -24,33 +24,30 @@ export class ProducerService {
             .createQueryBuilder('producer')
             .innerJoin('producer.movies', 'movie')
             .where('movie.winner = :winner', { winner: true })
-            .orderBy('producer.name', 'ASC')
-            .addOrderBy('movie.year', 'ASC')
+            .orderBy('movie.year', 'ASC')
             .select(['producer.name AS producer', 'movie.year AS year'])
             .getRawMany();
-    
-        if (!producers.length) {
-            throw new Error('Nenhum produtor com prêmios encontrado.');
-        }
-    
-        const producerAwardsMap = new Map<string, number[]>();
-    
-        producers.forEach(({ producer, year }) => {
-            const producerNames = producer.split(/,\s*| and /).map((p: string) => p.trim());
-    
+
+        const producerWins: Record<string, number[]> = {};
+
+        producers.forEach((row) => {
+            const producerNames = row.producer
+                .replace(/\sand\s/g, ", ")
+                .split(/,\s*/)
+                .map((name: string) => name.trim());
+
             producerNames.forEach((name: string) => {
-                if (!producerAwardsMap.has(name)) {
-                    producerAwardsMap.set(name, []);
+                if (!producerWins[name]) {
+                    producerWins[name] = [];
                 }
-                producerAwardsMap.get(name)?.push(year);
+                producerWins[name].push(row.year);
             });
         });
-    
+
         const intervals: Interval[] = [];
-    
-        producerAwardsMap.forEach((years, producer) => {
+
+        Object.entries(producerWins).forEach(([producer, years]) => {
             years.sort((a, b) => a - b);
-    
             for (let i = 1; i < years.length; i++) {
                 intervals.push({
                     producer,
@@ -60,17 +57,20 @@ export class ProducerService {
                 });
             }
         });
-    
+
         if (intervals.length === 0) {
             return { min: [], max: [] };
         }
-    
+
         const minInterval = Math.min(...intervals.map(i => i.interval));
         const maxInterval = Math.max(...intervals.map(i => i.interval));
-    
+
+        const minProducers = intervals.filter(i => i.interval === minInterval);
+        const maxProducers = intervals.filter(i => i.interval === maxInterval);
+
         return {
-            min: intervals.filter(i => i.interval === minInterval),
-            max: intervals.filter(i => i.interval === maxInterval),
+            min: minProducers,
+            max: maxProducers,
         };
     }
     

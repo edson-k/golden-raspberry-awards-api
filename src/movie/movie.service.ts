@@ -114,8 +114,11 @@ export class MovieService {
     
             const title = String(movieData.title).trim();
             const year = Number(movieData.year);
-            const winner = String(movieData.winner || '').toLowerCase() === 'yes';
-            const producerNames = String(movieData.producers).split(',').map(name => name.trim());
+            const winner = movieData.winner === 'true' || movieData.winner === 'yes';
+            const producerNames = String(movieData.producers)
+                .replace(/\sand\s/g, ", ")
+                .split(/,\s*/)
+                .map(name => name.trim());
     
             const producers = [];
             for (const producerName of producerNames) {
@@ -137,21 +140,23 @@ export class MovieService {
                 continue;
             }
     
-            const newMovie = this.movieRepository.create({
-                title,
-                year,
-                winner,
-                producer: producers[0], 
-            });
+            for (const producer of producers) {
+                const newMovie = this.movieRepository.create({
+                    title,
+                    year,
+                    winner,
+                    producer,
+                });
     
-            await this.movieRepository.save(newMovie);
-            insertedCount++;
+                await this.movieRepository.save(newMovie);
+                insertedCount++;
+            }
         }
     
         console.log(`Filmes inseridos com sucesso: ${insertedCount}`);
         console.log(`Filmes ignorados: ${ignoredCount}`);
         return { inserted: insertedCount, ignored: ignoredCount };
-    }
+    }    
 
     async delete(id: number): Promise<void> {
         const movie = await this.movieRepository.findOne({ where: { id } });

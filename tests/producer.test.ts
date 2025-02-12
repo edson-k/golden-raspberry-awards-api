@@ -15,15 +15,14 @@ describe('ProducerController', () => {
         await app.init();
     });
 
-    it('/producers/awards-intervals (GET) - Deve retornar os produtores com maior e menor intervalo entre prêmios', async () => {
+    it('/producers/awards-intervals (GET) - Deve garantir que os valores de min e max são consistentes', async () => {
         const response = await request(app.getHttpServer()).get('/producers/awards-intervals');
-
+        
         expect(response.status).toBe(200);
-        expect(response.body).toHaveProperty('min');
-        expect(response.body).toHaveProperty('max');
-
-        expect(Array.isArray(response.body.min)).toBe(true);
-        expect(Array.isArray(response.body.max)).toBe(true);
+        expect(response.body).toEqual({
+            min: [{ producer: "Joel Silver", interval: 1, previousWin: 1990, followingWin: 1991 }],
+            max: [{ producer: "Matthew Vaughn", interval: 13, previousWin: 2002, followingWin: 2015 }]
+        });
     });
 
     afterAll(async () => {
